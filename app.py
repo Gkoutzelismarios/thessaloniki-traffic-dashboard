@@ -10,7 +10,7 @@ st.title("🚦 Live-Style Geodata Dashboard: Traffic Thessaloniki")
 # 1. Φόρτωση των γεωχωρικών δεδομένων (GeoJSON)
 @st.cache_data
 def load_data():
-    gdf = gpd.read_file("real_thess_traffic.geojson")
+    gdf = gpd.read_file("https://github.com/Gkoutzelismarios/thessaloniki-traffic-dashboard/releases/download/v1.0/real_thess_traffic.json")
     
     # 🔥 ΔΙΟΡΘΩΣΗ ΣΦΑΛΜΑΤΟΣ: Μετατροπή όλων των στηλών (εκτός γεωμετρίας) σε απλό κείμενο/αριθμό
     # Αυτό αφαιρεί τυχόν ndarrays που κρασάρουν το Folium
