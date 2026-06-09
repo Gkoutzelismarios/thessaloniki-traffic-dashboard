@@ -21,24 +21,25 @@ st.markdown("---")
 # 3. ΦΟΡΤΩΣΗ ΔΕΔΟΜΕΝΩΝ (JSON / GEOJSON)
 @st.cache_data
 def load_geojson_data():
-    # 1. Φορτώνουμε το αρχείο χρησιμοποιώντας την κλασική βιβλιοθήκη json
+    # Φορτώνουμε το αρχείο χρησιμοποιώντας την κλασική βιβλιοθήκη json για αποφυγή pyogrio errors
     with open("real_thess_traffic.json", "r", encoding="utf-8") as f:
         data = json.load(f)
         
-    # 2. Μετατρέπουμε το json απευθείας σε GeoDataFrame (παρακάμπτοντας το pyogrio)
+    # Μετατρέπουμε το json απευθείας σε GeoDataFrame
     gdf = gpd.GeoDataFrame.from_features(data["features"])
     
-    # 3. Ορίζουμε το σύστημα συντεταγμένων σε WGS84 (παγκόσμιο)
+    # Ορίζουμε το σύστημα συντεταγμένων σε WGS84 (παγκόσμιο)
     gdf.set_crs(epsg=4326, inplace=True)
         
     # ΠΡΟΣΟΜΟΙΩΣΗ ΚΙΝΗΣΗΣ: Δημιουργούμε τυχαία κίνηση για κάθε δρόμο
     np.random.seed(42)
     traffic_types = ['Μποτιλιάρισμα', 'Καθυστερήσεις', 'Ελεύθερη Ροή']
-    colors = [,   # Κόκκινο
-        [ffd166, 200],   # Πορτοκαλί
-        [6, 214, 160, 200]     # Πράσινο
+    
+    # ΔΙΟΡΘΩΜΕΝΑ ΧΡΩΜΑΤΑ (Μορφή RGB με διαφάνεια άλφα: [R, G, B, Alpha])
+    colors = [,   # Κόκκινο (Μποτιλιάρισμα),  # Πορτοκαλί (Καθυστερήσεις)
+        [6, 214, 160, 200]     # Πράσινο (Ελεύθερη Ροή)
     ]
-    speeds = [12, 28, 65]
+    speeds = [12, 28, 55]
     
     choices = np.random.choice(len(traffic_types), size=len(gdf))
     
@@ -53,13 +54,7 @@ def load_geojson_data():
         
     return gdf
 
-    # Έλεγχος για το όνομα του δρόμου
-    if 'name' not in gdf.columns:
-        gdf['name'] = "Κεντρικός Άξονας / Στενό"
-        
-    return gdf
-
-# Φόρτωση των δεδομένων με ένδευξη loading
+# Φόρτωση των δεδομένων με ένδειξη loading
 with st.spinner("Φόρτωση οδικού δικτύου (6.000+ δρόμοι)... Παρακαλώ περιμένετε."):
     gdf_streets = load_geojson_data()
 
