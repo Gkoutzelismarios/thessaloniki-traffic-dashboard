@@ -105,7 +105,7 @@ if len(gdf_filtered) > 0:
         filled=False,
         extruded=False,
         get_line_color="properties.color",  
-        get_line_width=4,                  
+        get_line_width=6,                  
         line_width_min_pixels=2,           
     )
     
@@ -121,7 +121,7 @@ if len(gdf_filtered) > 0:
         layers=[layer],
         initial_view_state=view_state,
         map_provider="carto",       # Ορίζει ρητά την Carto ως πάροχο
-        map_style="dark",           # Επιλογές: 'dark', 'light', 'road', 'satellite'
+        map_style="road",           # Επιλογές: 'dark', 'light', 'road', 'satellite'
         tooltip={"text": "Οδός: {name}\nΚατάσταση: {status}\nΤαχύτητα: {speed}"}
     ))
 
