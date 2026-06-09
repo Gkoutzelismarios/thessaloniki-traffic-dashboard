@@ -35,18 +35,25 @@ def load_geojson_data():
     np.random.seed(42)
     traffic_types = ['Μποτιλιάρισμα', 'Καθυστερήσεις', 'Ελεύθερη Ροή']
     
-    # ΧΡΩΜΑΤΑ ΣΕ ΜΟΡΦΗ [R, G, B, Alpha]
-    colors = [,     # Κόκκινο (Μποτιλιάρισμα),   # Πορτοκαλί (Καθυστερήσεις)
-        [0, 255, 0, 200]      # Πράσινο (Ελεύθερη Ροή)
-    ]
-    speeds = [12, 25, 55]
+    # Ασφαλής εναλλακτική γραφή χρωμάτων για αποφυγή SyntaxError
+    colors_dict = {
+        'Μποτιλιάρισμα':,  # Κόκκινο
+        'Καθυστερήσεις':, # Πορτοκαλί
+        'Ελεύθερη Ροή': [6, 214, 160, 200]     # Πράσινο
+    }
     
-    choices = np.random.choice(len(traffic_types), size=len(gdf))
+    speeds_dict = {
+        'Μποτιλιάρισμα': 12,
+        'Καθυστερήσεις': 24,
+        'Ελεύθερη Ροή': 55
+    }
     
-    gdf['status'] = [traffic_types[i] for i in choices]
-    gdf['color'] = [colors[i] for i in choices]
-    gdf['speed'] = [f"{speeds[i]} χλμ/ώ" for i in choices]
-    gdf['speed_numeric'] = [speeds[i] for i in choices]
+    choices = np.random.choice(traffic_types, size=len(gdf))
+    
+    gdf['status'] = choices
+    gdf['color'] = [colors_dict[status] for status in choices]
+    gdf['speed_numeric'] = [speeds_dict[status] for status in choices]
+    gdf['speed'] = [f"{speeds_dict[status]} χλμ/ώ" for status in choices]
     
     # Έλεγχος για το όνομα του δρόμου
     if 'name' not in gdf.columns:
