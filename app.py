@@ -21,25 +21,23 @@ st.markdown("---")
 # 3. ΦΟΡΤΩΣΗ ΔΕΔΟΜΕΝΩΝ (JSON / GEOJSON)
 @st.cache_data
 def load_geojson_data():
-    # Φορτώνουμε το αρχείο χρησιμοποιώντας την κλασική βιβλιοθήκη json για αποφυγή pyogrio errors
+    # Φορτώνουμε το αρχείο χρησιμοποιώντας την κλασική βιβλιοθήκη json
     with open("real_thess_traffic.json", "r", encoding="utf-8") as f:
         data = json.load(f)
         
-    # Μετατρέπουμε το json απευθείας σε GeoDataFrame
+    # Μετατρέπουμε το json σε GeoDataFrame
     gdf = gpd.GeoDataFrame.from_features(data["features"])
-    
-    # Ορίζουμε το σύστημα συντεταγμένων σε WGS84 (παγκόσμιο)
     gdf.set_crs(epsg=4326, inplace=True)
         
-    # ΠΡΟΣΟΜΟΙΩΣΗ ΚΙΝΗΣΗΣ: Δημιουργούμε τυχαία κίνηση για κάθε δρόμο
+    # ΠΡΟΣΟΜΟΙΩΣΗ ΚΙΝΗΣΗΣ
     np.random.seed(42)
     traffic_types = ['Μποτιλιάρισμα', 'Καθυστερήσεις', 'Ελεύθερη Ροή']
     
-    # Ασφαλής εναλλακτική γραφή χρωμάτων για αποφυγή SyntaxError
-    colors_dict = {
-        'Μποτιλιάρισμα':,  # Κόκκινο
-        'Καθυστερήσεις':, # Πορτοκαλί
-        'Ελεύθερη Ροή': [6, 214, 160, 200]     # Πράσινο
+    # Χρήση strings για απόλυτη ασφάλεια κατά της διαγραφής κώδικα
+    colors_string = {
+        'Μποτιλιάρισμα': "239,35,60,200",   # Κόκκινο
+        'Καθυστερήσεις': "255,159,67,200",  # Πορτοκαλί
+        'Ελεύθερη Ροή': "76,201,240,180"    # Γαλάζιο/Πράσινο
     }
     
     speeds_dict = {
@@ -51,9 +49,11 @@ def load_geojson_data():
     choices = np.random.choice(traffic_types, size=len(gdf))
     
     gdf['status'] = choices
-    gdf['color'] = [colors_dict[status] for status in choices]
     gdf['speed_numeric'] = [speeds_dict[status] for status in choices]
     gdf['speed'] = [f"{speeds_dict[status]} χλμ/ώ" for status in choices]
+    
+    # Μετατροπή του string σε πραγματική λίστα αριθμών [R, G, B, A] για το Pydeck
+    gdf['color'] = [[int(x) for x in colors_string[status].split(',')] for status in choices]
     
     # Έλεγχος για το όνομα του δρόμου
     if 'name' not in gdf.columns:
@@ -61,7 +61,7 @@ def load_geojson_data():
         
     return gdf
 
-# Φόρτωση των δεδομένων με ένδειξη loading
+# Φόρτωση των δεδομένων
 with st.spinner("Φόρτωση οδικού δικτύου (6.000+ δρόμοι)... Παρακαλώ περιμένετε."):
     gdf_streets = load_geojson_data()
 
@@ -88,17 +88,14 @@ st.sidebar.header("📍 Φίλτρα Κατάστασης")
     default=['Μποτιλιάρισμα', 'Καθυστερήσεις', 'Ελεύθερη Ροή']
 )
 
-# Φιλτράρισμα του GeoDataFrame βάσει της επιλογής του χρήστη
 gdf_filtered = gdf_streets[gdf_streets['status'].isin(επιλογή_κατάστασης)]
 
 # 6. ΕΜΦΑΝΙΣΗ ΧΑΡΤΗ
 st.subheader("🗺️ Διαδραστικό Ψηφιακό Δίκτυο Κίνησης")
 
 if len(gdf_filtered) > 0:
-    # Μετατροπή σε Python dictionary (JSON) για μέγιστη ταχύτητα στο Pydeck
     geojson_dict = json.loads(gdf_filtered.to_json())
     
-    # Χρήση GeoJsonLayer για σχεδίαση χιλιάδων γραμμών ταυτόχρονα
     layer = pdk.Layer(
         "GeoJsonLayer",
         geojson_dict,
@@ -106,12 +103,11 @@ if len(gdf_filtered) > 0:
         stroked=True,
         filled=False,
         extruded=False,
-        get_line_color="properties.color",  # Διαβάζει το χρώμα από τα properties του GeoJSON
-        get_line_width=4,                  # Πάχος γραμμής των δρόμων
-        line_width_min_pixels=2,           # Ελάχιστο πάχος για zoom out
+        get_line_color="properties.color",  
+        get_line_width=4,                  
+        line_width_min_pixels=2,           
     )
     
-    # Αυτόματο κεντράρισμα στη Θεσσαλονίκη
     view_state = pdk.ViewState(
         latitude=40.640,
         longitude=22.944,
@@ -119,7 +115,6 @@ if len(gdf_filtered) > 0:
         pitch=0
     )
     
-    # Σχεδίαση χάρτη
     st.pydeck_chart(pdk.Deck(
         layers=[layer],
         initial_view_state=view_state,
