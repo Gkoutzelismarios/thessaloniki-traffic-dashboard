@@ -23,7 +23,7 @@ st.markdown("---")
 @st.cache_data
 def load_geojson_data():
     # ⚠️ ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΑΥΤΟ ΤΟ LINK ΜΕ ΤΟ ΔΙΚΟ ΣΑΣ LINK ΑΠΟ ΤΟ GITHUB RELEASE
-    RELEASE_URL = "https://github.com"
+    RELEASE_URL = "https://github.com/Gkoutzelismarios/thessaloniki-traffic-dashboard/releases/download/v1.0/real_thess_traffic.json"
     
     # Κατέβασμα του αρχείου 30MB από το ίντερνετ
     response = requests.get(RELEASE_URL)
