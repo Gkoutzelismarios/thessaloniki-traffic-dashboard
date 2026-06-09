@@ -3,6 +3,7 @@ import geopandas as gpd
 import pydeck as pdk
 import numpy as np
 import json
+import requests  # Χρειάζεται για να κατεβάσουμε το αρχείο από το Release URL
 
 # 1. ΥΠΟΧΡΕΩΤΙΚΑ ΣΤΗΝ ΠΡΩΤΗ ΓΡΑΜΜΗ ΚΩΔΙΚΑ
 st.set_page_config(
@@ -18,14 +19,18 @@ st.markdown("### Πλήρες Ψηφιακό Μοντέλο Οδικού Δικ�
 st.caption("Η εφαρμογή εκτελείται ζωντανά στον browser σας. Δεν απαιτείται καμία εγκατάσταση.")
 st.markdown("---")
 
-# 3. ΦΟΡΤΩΣΗ ΔΕΔΟΜΕΝΩΝ (JSON / GEOJSON)
+# 3. ΦΟΡΤΩΣΗ ΔΕΔΟΜΕΝΩΝ ΑΠΟ GITHUB RELEASE URL
 @st.cache_data
 def load_geojson_data():
-    # Φορτώνουμε το αρχείο χρησιμοποιώντας την κλασική βιβλιοθήκη json
-    with open("real_thess_traffic.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
+    # ⚠️ ΑΝΤΙΚΑΤΑΣΤΗΣΤΕ ΑΥΤΟ ΤΟ LINK ΜΕ ΤΟ ΔΙΚΟ ΣΑΣ LINK ΑΠΟ ΤΟ GITHUB RELEASE
+    RELEASE_URL = "https://github.com"
+    
+    # Κατέβασμα του αρχείου 30MB από το ίντερνετ
+    response = requests.get(RELEASE_URL)
+    response.raise_for_status() # Έλεγχος αν κατέβηκε επιτυχώς
+    data = response.json()
         
-    # Μετατρέπουμε το json σε GeoDataFrame
+    # Μετατροπή του json σε GeoDataFrame
     gdf = gpd.GeoDataFrame.from_features(data["features"])
     gdf.set_crs(epsg=4326, inplace=True)
         
@@ -33,7 +38,6 @@ def load_geojson_data():
     np.random.seed(42)
     traffic_types = ['Μποτιλιάρισμα', 'Καθυστερήσεις', 'Ελεύθερη Ροή']
     
-    # Χρήση strings για απόλυτη ασφάλεια κατά της διαγραφής κώδικα
     colors_string = {
         'Μποτιλιάρισμα': "239,35,60,200",   # Κόκκινο
         'Καθυστερήσεις': "255,159,67,200",  # Πορτοκαλί
@@ -51,18 +55,15 @@ def load_geojson_data():
     gdf['status'] = choices
     gdf['speed_numeric'] = [speeds_dict[status] for status in choices]
     gdf['speed'] = [f"{speeds_dict[status]} χλμ/ώ" for status in choices]
-    
-    # Μετατροπή του string σε πραγματική λίστα αριθμών [R, G, B, A] για το Pydeck
     gdf['color'] = [[int(x) for x in colors_string[status].split(',')] for status in choices]
     
-    # Έλεγχος για το όνομα του δρόμου
     if 'name' not in gdf.columns:
         gdf['name'] = "Κεντρικός Άξονας / Στενό"
         
     return gdf
 
 # Φόρτωση των δεδομένων
-with st.spinner("Φόρτωση οδικού δικτύου (6.000+ δρόμοι)... Παρακαλώ περιμένετε."):
+with st.spinner("Λήψη και φόρτωση οδικού δικτύου από το GitHub Releases... Παρακαλώ περιμένετε."):
     gdf_streets = load_geojson_data()
 
 # 4. ΣΤΑΤΙΣΤΙΚΑ ΣΤΟΙΧΕΙΑ (KPIs)
