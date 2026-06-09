@@ -119,7 +119,7 @@ if len(gdf_filtered) > 0:
     st.pydeck_chart(pdk.Deck(
         layers=[layer],
         initial_view_state=view_state,
-        map_style="mapbox://styles/mapbox/dark-v10",
+        map_style="carto_light",
         tooltip={"text": "Οδός: {name}\nΚατάσταση: {status}\nΤαχύτητα: {speed}"}
     ))
 else:
