@@ -1,4 +1,9 @@
 import streamlit as st
+st.set_page_config(
+    page_title="Το Όνομα της Εφαρμογής σας",
+    layout="wide", # Κάνει την εφαρμογή να πιάνει όλη την οθόνη εξαρχής
+    initial_sidebar_state="expanded"
+)
 import geopandas as gpd
 import folium
 from streamlit_folium import st_folium
