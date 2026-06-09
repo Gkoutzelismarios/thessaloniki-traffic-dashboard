@@ -116,12 +116,15 @@ if len(gdf_filtered) > 0:
         pitch=0
     )
     
+        # Σχεδίαση χάρτη με ρητό ορισμό παρόχου Carto (Δεν απαιτεί Token)
     st.pydeck_chart(pdk.Deck(
         layers=[layer],
         initial_view_state=view_state,
-        map_style="carto_light",
+        map_provider="carto",       # Ορίζει ρητά την Carto ως πάροχο
+        map_style="dark",           # Επιλογές: 'dark', 'light', 'road', 'satellite'
         tooltip={"text": "Οδός: {name}\nΚατάσταση: {status}\nΤαχύτητα: {speed}"}
     ))
+
 else:
     st.error("Παρακαλώ επιλέξτε τουλάχιστον μια κατάσταση κίνησης από το μενού αριστερά.")
 
