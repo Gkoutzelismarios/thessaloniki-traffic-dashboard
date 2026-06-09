@@ -1,8 +1,26 @@
 import streamlit as st
+
+# ΑΥΤΗ Η ΡΥΘΜΙΣΗ ΠΡΕΠΕΙ ΝΑ ΕΙΝΑΙ Η ΠΡΩΤΗ ΕΝΤΟΛΗ STREAMLIT ΣΤΟΝ ΚΩΔΙΚΑ
 st.set_page_config(
-    page_title="Το Όνομα της Εφαρμογής σας",
-    layout="wide", # Κάνει την εφαρμογή να πιάνει όλη την οθόνη εξαρχής
-    initial_sidebar_state="expanded"
+    page_title="Thessaloniki Traffic Dashboard",
+    page_icon="🚗",
+    layout="wide",  # Απλώνει την εφαρμογή σε όλο το πλάτος της οθόνης
+    initial_sidebar_state="expanded"  # Κρατάει το μενού ανοιχτό αν υπάρχει
+)
+
+# ΤΙΤΛΟΣ ΤΗΣ ΕΦΑΡΜΟΓΗΣ
+st.title("🚗 Thessaloniki Traffic Dashboard")
+st.markdown("---")
+
+# ΕΔΩ ΣΥΝΕΧΙΖΕΤΕ ΜΕ ΤΟΝ ΥΠΟΛΟΙΠΟ ΚΩΔΙΚΑ ΤΗΣ ΕΦΑΡΜΟΓΗΣ ΣΑΣ
+st.subheader("Ζωντανή Εικόνα Κίνησης")
+st.info("Η εφαρμογή τρέχει κανονικά στον browser σας. Δεν απαιτείται καμία εγκατάσταση εφαρμογής.")
+
+# Παράδειγμα για το πού θα μπουν τα widget σας:
+# col1, col2 = st.columns(2)
+# with col1:
+#     st.write("Δεδομένα Κίνησης")
+
 )
 import geopandas as gpd
 import folium
